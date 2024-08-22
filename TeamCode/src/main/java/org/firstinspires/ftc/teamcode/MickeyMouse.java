@@ -1,18 +1,20 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import java.awt.font.NumericShaper;
 
 @TeleOp(name = "MickeyMouse", group = "Teleop")
 public class MickeyMouse extends OpMode {
-    DcMotor frontleftdrive = null;
-    DcMotor frontrightdrive = null;
-    DcMotor backleftdrive = null;
-    DcMotor backrightdrive = null;
+
     //Controller buttons
     boolean aPress1;
     boolean bPress1;
@@ -40,15 +42,14 @@ public class MickeyMouse extends OpMode {
     double movementDegree = 0;
     double gamepadHypot = 0;
     double power = 0.2;
+    double robotdegree = 0;
+    boolean fieldcentric = false;
+    Robot mickey = new Robot();
     //
     static long loopstart = System.currentTimeMillis();
     @Override
     public void init() {
-        frontleftdrive = hardwareMap.get(DcMotor.class, "front_left_drive");
-        frontrightdrive = hardwareMap.get(DcMotor.class, "front_right_drive");
-        backleftdrive = hardwareMap.get(DcMotor.class, "back_left_drive");
-        backrightdrive = hardwareMap.get(DcMotor.class, "back_right_drive");
-
+         mickey.initHardware(hardwareMap);
     }
     public void loop() {
         LOOPSTART();
@@ -63,6 +64,11 @@ public class MickeyMouse extends OpMode {
     }
     public static double GETLOOPTIME() {
         return((double)(System.currentTimeMillis() - loopstart));
+    }
+    public void resetIMU() {mickey.imu.resetYaw();}
+    public double getIMUHeading() {
+        YawPitchRollAngles ypr = mickey.imu.getRobotYawPitchRollAngles();
+        return ypr.getYaw(AngleUnit.DEGREES);
     }
     public void updateController() {
         dpadDown1_down = gamepad1.dpad_down && !dpadDown1;
@@ -80,6 +86,7 @@ public class MickeyMouse extends OpMode {
     }
 
     public void updateMotor() {
+        robotdegree = getIMUHeading();
         gamepadXCoordinate = gamepad1.left_stick_x;
         gamepadYCoordinate  = gamepad1.left_stick_y;
 
@@ -87,7 +94,7 @@ public class MickeyMouse extends OpMode {
         gamepadHypot = Range.clip(Math.hypot(gamepadXCoordinate, gamepadYControl), 0, 1);
         gamepadDegree = Math.atan2(gamepadYCoordinate, gamepadXCoordinate);
 
-        movementDegree = gamepadDegree;
+        movementDegree = gamepadDegree - robotdegree;
         gamepadYControl = Math.sin(movementDegree) * gamepadHypot;
         gamepadXControl = Math.cos(movementDegree) * gamepadHypot;
 
@@ -95,10 +102,10 @@ public class MickeyMouse extends OpMode {
         backrightcurrent = (power * (driverTurn+ (-gamepadYControl) - gamepadXControl));
         frontleftcurrent = (power * (driverTurn+ (-gamepadYControl) - gamepadXControl));
         backleftcurrent = (power * (driverTurn+ (-gamepadYControl) + gamepadXControl));
-        frontleftdrive.setPower(frontleftcurrent);
-        frontrightdrive.setPower(frontrightcurrent);
-        backleftdrive.setPower(backleftcurrent);
-        backrightdrive.setPower(backrightcurrent);
+        mickey.frontleftdrive.setPower(frontleftcurrent);
+        mickey.frontrightdrive.setPower(frontrightcurrent);
+        mickey.backleftdrive.setPower(backleftcurrent);
+        mickey.backrightdrive.setPower(backrightcurrent);
         driverTurn = gamepad1.right_stick_x;
 
 
