@@ -90,14 +90,15 @@ public class MickeyMouse extends OpMode {
         movementDegree = gamepadDegree;
         gamepadYControl = Math.sin(movementDegree) * gamepadHypot;
         gamepadXControl = Math.cos(movementDegree) * gamepadHypot;
-        frontleftdrive.setPower(frontleftcurrent);
-        frontrightdrive.setPower(frontrightcurrent);
-        backleftdrive.setPower(backleftcurrent);
-        backrightdrive.setPower(backrightcurrent);
+
         frontrightcurrent = (power * (driverTurn+ (-gamepadYControl) + gamepadXControl));
         backrightcurrent = (power * (driverTurn+ (-gamepadYControl) - gamepadXControl));
         frontleftcurrent = (power * (driverTurn+ (-gamepadYControl) - gamepadXControl));
         backleftcurrent = (power * (driverTurn+ (-gamepadYControl) + gamepadXControl));
+        frontleftdrive.setPower(frontleftcurrent);
+        frontrightdrive.setPower(frontrightcurrent);
+        backleftdrive.setPower(backleftcurrent);
+        backrightdrive.setPower(backrightcurrent);
         driverTurn = gamepad1.right_stick_x;
 
 
