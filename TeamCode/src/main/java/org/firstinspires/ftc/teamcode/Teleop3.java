@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "TeleOp", group = "!Teleop")
     public class Teleop3 extends OpMode {
-        private DcMotor leftMotor = null;
+        private DcMotor leftMotor = null; //comments
         private Servo intakeServo = null;
         @Override
         public void init() {
